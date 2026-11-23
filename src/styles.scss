@@ -1,0 +1,157 @@
+/* Estilos globales de ForoNova (sobre Bootstrap 5) */
+
+:root {
+  --bs-primary: #4f46e5;
+  --bs-primary-rgb: 79, 70, 229;
+  --bs-link-color: #4f46e5;
+  --bs-link-color-rgb: 79, 70, 229;
+  --bs-link-hover-color: #3730a3;
+  --bs-link-hover-color-rgb: 55, 48, 163;
+  --nova-acento: #14b8a6;
+  --nova-fondo: #f4f5fb;
+}
+
+body {
+  background: var(--nova-fondo);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+/* Botones con los colores de la marca */
+.btn-primary {
+  --bs-btn-bg: #4f46e5;
+  --bs-btn-border-color: #4f46e5;
+  --bs-btn-hover-bg: #4338ca;
+  --bs-btn-hover-border-color: #3730a3;
+  --bs-btn-active-bg: #3730a3;
+  --bs-btn-active-border-color: #312e81;
+  --bs-btn-disabled-bg: #4f46e5;
+  --bs-btn-disabled-border-color: #4f46e5;
+  --bs-btn-focus-shadow-rgb: 79, 70, 229;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #4f46e5;
+  --bs-btn-border-color: #4f46e5;
+  --bs-btn-hover-bg: #4f46e5;
+  --bs-btn-hover-border-color: #4f46e5;
+  --bs-btn-active-bg: #4338ca;
+  --bs-btn-active-border-color: #4338ca;
+  --bs-btn-disabled-color: #4f46e5;
+  --bs-btn-disabled-border-color: #4f46e5;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.2);
+}
+
+/* Barra superior */
+.app-navbar {
+  background: linear-gradient(90deg, #312e81, #4f46e5);
+}
+
+.app-navbar .nav-link.active {
+  color: #fff;
+  font-weight: 600;
+  border-bottom: 2px solid var(--nova-acento);
+}
+
+/* Portada del inicio */
+.hero {
+  background: linear-gradient(120deg, #4f46e5 0%, #6366f1 55%, #14b8a6 100%);
+  color: #fff;
+  border-radius: 1rem;
+}
+
+/* Tarjetas */
+.tarjeta {
+  border: 0;
+  border-radius: 0.9rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.tarjeta-categoria {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  color: inherit;
+  text-decoration: none;
+}
+
+.tarjeta-categoria:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+.icono-categoria {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+/* Avatar con iniciales */
+.avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.avatar-grande {
+  width: 5rem;
+  height: 5rem;
+  font-size: 1.6rem;
+}
+
+/* Contenido retirado por moderacion */
+.contenido-baneado {
+  background: #fef2f2;
+  border: 1px dashed #f87171;
+  color: #b91c1c;
+  border-radius: 0.6rem;
+}
+
+.lista-tema {
+  text-decoration: none;
+  color: inherit;
+}
+
+.lista-tema:hover {
+  background: #f8f9ff;
+}
+
+.texto-cortado {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+footer.pie {
+  background: #1e1b4b;
+  color: #c7d2fe;
+}
