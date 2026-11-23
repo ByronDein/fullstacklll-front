@@ -1,0 +1,122 @@
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <h1 class="h3 fw-bold mb-1"><i class="bi bi-shield-check me-2"></i>Moderación</h1>
+    <p class="text-muted mb-0">Banea los temas y comentarios que incumplan las normas del foro.</p>
+  </div>
+  <span class="badge text-bg-danger fs-6">{{ totalBaneados() }} contenidos baneados</span>
+</div>
+
+<!-- Pestanas y filtro -->
+<div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
+  <ul class="nav nav-pills">
+    <li class="nav-item">
+      <button type="button" class="nav-link" [class.active]="pestana() === 'temas'" (click)="cambiarPestana('temas')">
+        <i class="bi bi-journal-text me-1"></i>Temas
+      </button>
+    </li>
+    <li class="nav-item">
+      <button type="button" class="nav-link" [class.active]="pestana() === 'comentarios'" (click)="cambiarPestana('comentarios')">
+        <i class="bi bi-chat-dots me-1"></i>Comentarios
+      </button>
+    </li>
+  </ul>
+
+  <div class="btn-group" role="group" aria-label="Filtrar por estado">
+    <button type="button" class="btn btn-sm" [class]="filtro() === 'todos' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-primary'" (click)="filtro.set('todos')">Todos</button>
+    <button type="button" class="btn btn-sm" [class]="filtro() === 'activos' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-primary'" (click)="filtro.set('activos')">Activos</button>
+    <button type="button" class="btn btn-sm" [class]="filtro() === 'baneados' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-primary'" (click)="filtro.set('baneados')">Baneados</button>
+  </div>
+</div>
+
+<!-- Panel para indicar el motivo del baneo -->
+@if (seleccion(); as sel) {
+  <div class="card tarjeta border border-danger mb-3">
+    <div class="card-body">
+      <h2 class="h6 fw-bold text-danger"><i class="bi bi-slash-circle me-1"></i>Banear {{ sel.tipo === 'temas' ? 'tema' : 'comentario' }}</h2>
+      <p class="small text-muted texto-cortado">"{{ sel.titulo }}"</p>
+      <form [formGroup]="formMotivo" (ngSubmit)="confirmarBaneo()" novalidate>
+        <label for="motivo" class="form-label">Motivo del baneo</label>
+        <input id="motivo" type="text" class="form-control" formControlName="motivo"
+               placeholder="Ej: Spam, insultos, contenido ofensivo..."
+               [class.is-invalid]="formMotivo.controls.motivo.invalid && formMotivo.controls.motivo.touched" />
+        <app-error-campo [control]="formMotivo.controls.motivo" [mensajes]="{
+          required: 'Debes indicar el motivo',
+          minlength: 'Debe tener al menos 5 caracteres',
+          maxlength: 'No puede superar los 150 caracteres'
+        }" />
+        <div class="d-flex gap-2 mt-3">
+          <button type="submit" class="btn btn-danger btn-sm">Confirmar baneo</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelar()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+@if (pestana() === 'temas') {
+  <div class="d-flex flex-column gap-2">
+    @for (tema of temas(); track tema.id) {
+      <div class="card tarjeta" [class.border-danger]="tema.baneado">
+        <div class="card-body d-flex flex-column flex-md-row justify-content-between gap-2">
+          <div>
+            <a [routerLink]="['/tema', tema.id]" class="fw-bold text-decoration-none">{{ tema.titulo }}</a>
+            @if (tema.baneado) { <span class="badge text-bg-danger ms-2">BANEADO</span> }
+            <div class="small text-muted">
+              {{ nombreAutor(tema.autorId) }} · {{ tema.fecha | date: 'dd/MM/yyyy HH:mm' }}
+            </div>
+            @if (tema.baneado) {
+              <div class="small text-danger mt-1"><i class="bi bi-info-circle me-1"></i>Motivo: {{ tema.motivoBan }}</div>
+            }
+          </div>
+          <div class="flex-shrink-0">
+            @if (tema.baneado) {
+              <button type="button" class="btn btn-outline-success btn-sm" (click)="restaurar('temas', tema.id)">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>Restaurar
+              </button>
+            } @else {
+              <button type="button" class="btn btn-outline-danger btn-sm" (click)="iniciarBaneo('temas', tema.id, tema.titulo)">
+                <i class="bi bi-slash-circle me-1"></i>Banear
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="text-center text-muted py-5">No hay temas con este filtro.</div>
+    }
+  </div>
+} @else {
+  <div class="d-flex flex-column gap-2">
+    @for (comentario of comentarios(); track comentario.id) {
+      <div class="card tarjeta" [class.border-danger]="comentario.baneado">
+        <div class="card-body d-flex flex-column flex-md-row justify-content-between gap-2">
+          <div>
+            <p class="mb-1 texto-cortado">{{ comentario.contenido }}</p>
+            @if (comentario.baneado) { <span class="badge text-bg-danger">BANEADO</span> }
+            <div class="small text-muted">
+              {{ nombreAutor(comentario.autorId) }} · en
+              <a [routerLink]="['/tema', comentario.temaId]">{{ tituloTema(comentario.temaId) }}</a>
+              · {{ comentario.fecha | date: 'dd/MM/yyyy HH:mm' }}
+            </div>
+            @if (comentario.baneado) {
+              <div class="small text-danger mt-1"><i class="bi bi-info-circle me-1"></i>Motivo: {{ comentario.motivoBan }}</div>
+            }
+          </div>
+          <div class="flex-shrink-0">
+            @if (comentario.baneado) {
+              <button type="button" class="btn btn-outline-success btn-sm" (click)="restaurar('comentarios', comentario.id)">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>Restaurar
+              </button>
+            } @else {
+              <button type="button" class="btn btn-outline-danger btn-sm" (click)="iniciarBaneo('comentarios', comentario.id, comentario.contenido)">
+                <i class="bi bi-slash-circle me-1"></i>Banear
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="text-center text-muted py-5">No hay comentarios con este filtro.</div>
+    }
+  </div>
+}
