@@ -1,0 +1,82 @@
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-5">
+    <div class="card tarjeta">
+      <div class="card-body p-4">
+        <div class="text-center mb-4">
+          <img src="logo.svg" width="56" height="56" alt="Logo de ForoNova" class="mb-2" />
+          <h1 class="h4 fw-bold mb-1">Recuperar contraseña</h1>
+          <p class="text-muted mb-0">
+            @if (paso() === 1) { Te enviaremos un código a tu correo } @else { Ingresa el código y tu nueva contraseña }
+          </p>
+        </div>
+
+        @if (error()) {
+          <div class="alert alert-danger py-2" role="alert">
+            <i class="bi bi-exclamation-triangle me-1"></i>{{ error() }}
+          </div>
+        }
+
+        @if (exito()) {
+          <div class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle me-1"></i>¡Contraseña actualizada! Te llevamos al inicio de sesión...
+          </div>
+        } @else if (paso() === 1) {
+          <form [formGroup]="formCorreo" (ngSubmit)="enviarCodigo()" novalidate>
+            <div class="mb-3">
+              <label for="correo" class="form-label">Correo electrónico</label>
+              <input id="correo" type="email" class="form-control" formControlName="correo" autocomplete="email"
+                     [class.is-invalid]="formCorreo.controls.correo.invalid && formCorreo.controls.correo.touched" />
+              <app-error-campo [control]="formCorreo.controls.correo"
+                [mensajes]="{ required: 'El correo es obligatorio', email: 'Ingresa un correo válido' }" />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Enviar código</button>
+          </form>
+        } @else {
+          <div class="alert alert-info py-2 small" role="status">
+            <i class="bi bi-envelope-paper me-1"></i>
+            <strong>Correo simulado:</strong> tu código de recuperación es
+            <strong class="fs-6">{{ codigoSimulado() }}</strong>
+          </div>
+
+          <form [formGroup]="formClave" (ngSubmit)="cambiarClave()" novalidate>
+            <div class="mb-3">
+              <label for="codigo" class="form-label">Código de 6 dígitos</label>
+              <input id="codigo" type="text" inputmode="numeric" maxlength="6" class="form-control" formControlName="codigo"
+                     [class.is-invalid]="formClave.controls.codigo.invalid && formClave.controls.codigo.touched" />
+              <app-error-campo [control]="formClave.controls.codigo"
+                [mensajes]="{ required: 'El código es obligatorio', pattern: 'Debe tener 6 dígitos numéricos' }" />
+            </div>
+
+            <div class="mb-3">
+              <label for="clave" class="form-label">Nueva contraseña</label>
+              <input id="clave" type="password" class="form-control" formControlName="clave" autocomplete="new-password"
+                     [class.is-invalid]="formClave.controls.clave.invalid && formClave.controls.clave.touched" />
+              <app-error-campo [control]="formClave.controls.clave" [mensajes]="{ required: 'La contraseña es obligatoria' }" />
+              <app-checklist-clave [valor]="formClave.controls.clave.value" />
+            </div>
+
+            <div class="mb-3">
+              <label for="confirmarClave" class="form-label">Confirmar contraseña</label>
+              <input id="confirmarClave" type="password" class="form-control" formControlName="confirmarClave"
+                     autocomplete="new-password"
+                     [class.is-invalid]="formClave.controls.confirmarClave.touched && (formClave.controls.confirmarClave.invalid || formClave.hasError('noCoinciden'))" />
+              <app-error-campo [control]="formClave.controls.confirmarClave" [mensajes]="{ required: 'Debes confirmar la contraseña' }" />
+              @if (formClave.hasError('noCoinciden') && formClave.controls.confirmarClave.touched && formClave.controls.confirmarClave.value) {
+                <div class="invalid-feedback d-block">Las contraseñas no coinciden</div>
+              }
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-secondary" (click)="volver()">Atrás</button>
+              <button type="submit" class="btn btn-primary flex-grow-1">Cambiar contraseña</button>
+            </div>
+          </form>
+        }
+
+        <p class="text-center mt-3 mb-0">
+          <a routerLink="/login">Volver a iniciar sesión</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

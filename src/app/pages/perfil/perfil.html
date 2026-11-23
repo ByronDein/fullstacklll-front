@@ -1,0 +1,125 @@
+<h1 class="h3 fw-bold mb-4"><i class="bi bi-person-circle me-2"></i>Mi perfil</h1>
+
+@if (auth.usuarioActual(); as usuario) {
+  <div class="row g-4">
+    <!-- Resumen -->
+    <div class="col-12 col-lg-4">
+      <div class="card tarjeta text-center">
+        <div class="card-body p-4">
+          <span class="avatar avatar-grande mb-3" [style.background]="colorAvatar(usuario.id)">{{ iniciales(usuario.nombre) }}</span>
+          <h2 class="h5 fw-bold mb-1">{{ usuario.nombre }}</h2>
+          <span class="badge" [class]="'badge ' + claseRol(usuario.rol)">{{ usuario.rol }}</span>
+          <p class="text-muted small mt-3 mb-1">{{ usuario.correo }}</p>
+          <p class="text-muted small">Miembro desde {{ usuario.fechaRegistro | date: 'dd/MM/yyyy' }}</p>
+          @if (usuario.biografia) {
+            <p class="fst-italic mb-3">"{{ usuario.biografia }}"</p>
+          }
+          <div class="row text-center border-top pt-3">
+            <div class="col-6">
+              <div class="fs-4 fw-bold text-primary">{{ totalTemas() }}</div>
+              <div class="small text-muted">Temas</div>
+            </div>
+            <div class="col-6">
+              <div class="fs-4 fw-bold text-primary">{{ totalComentarios() }}</div>
+              <div class="small text-muted">Comentarios</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-8">
+      <!-- Datos personales -->
+      <div class="card tarjeta mb-4">
+        <div class="card-body p-4">
+          <h2 class="h5 fw-bold mb-3">Datos personales</h2>
+
+          @if (mensajePerfil()) {
+            <div class="alert alert-success py-2" role="status"><i class="bi bi-check-circle me-1"></i>{{ mensajePerfil() }}</div>
+          }
+
+          <form [formGroup]="formPerfil" (ngSubmit)="guardarPerfil()" novalidate>
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label for="nombre" class="form-label">Nombre completo</label>
+                <input id="nombre" type="text" class="form-control" formControlName="nombre"
+                       [class.is-invalid]="formPerfil.controls.nombre.invalid && formPerfil.controls.nombre.touched" />
+                <app-error-campo [control]="formPerfil.controls.nombre" [mensajes]="{
+                  required: 'El nombre es obligatorio',
+                  minlength: 'Debe tener al menos 3 caracteres',
+                  maxlength: 'No puede superar los 40 caracteres',
+                  pattern: 'Solo se permiten letras y espacios'
+                }" />
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="correo" class="form-label">Correo electrónico</label>
+                <input id="correo" type="email" class="form-control" formControlName="correo"
+                       [class.is-invalid]="formPerfil.controls.correo.invalid && formPerfil.controls.correo.touched" />
+                <app-error-campo [control]="formPerfil.controls.correo" [mensajes]="{
+                  required: 'El correo es obligatorio',
+                  email: 'Ingresa un correo válido',
+                  correoEnUso: 'Este correo ya pertenece a otra cuenta'
+                }" />
+              </div>
+              <div class="col-12">
+                <label for="biografia" class="form-label">
+                  Biografía <span class="text-muted small">({{ formPerfil.controls.biografia.value.length }}/200)</span>
+                </label>
+                <textarea id="biografia" rows="3" class="form-control" formControlName="biografia"
+                          [class.is-invalid]="formPerfil.controls.biografia.invalid"></textarea>
+                <app-error-campo [control]="formPerfil.controls.biografia" [mensajes]="{ maxlength: 'No puede superar los 200 caracteres' }" />
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Cambiar contrasena -->
+      <div class="card tarjeta">
+        <div class="card-body p-4">
+          <h2 class="h5 fw-bold mb-3">Cambiar contraseña</h2>
+
+          @if (mensajeClave()) {
+            <div class="alert alert-success py-2" role="status"><i class="bi bi-check-circle me-1"></i>{{ mensajeClave() }}</div>
+          }
+          @if (errorClave()) {
+            <div class="alert alert-danger py-2" role="alert"><i class="bi bi-exclamation-triangle me-1"></i>{{ errorClave() }}</div>
+          }
+
+          <form [formGroup]="formClave" (ngSubmit)="cambiarClave()" novalidate>
+            <div class="row g-3">
+              <div class="col-12">
+                <label for="claveActual" class="form-label">Contraseña actual</label>
+                <input id="claveActual" type="password" class="form-control" formControlName="claveActual" autocomplete="current-password"
+                       [class.is-invalid]="formClave.controls.claveActual.invalid && formClave.controls.claveActual.touched" />
+                <app-error-campo [control]="formClave.controls.claveActual" [mensajes]="{ required: 'Ingresa tu contraseña actual' }" />
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="clave" class="form-label">Nueva contraseña</label>
+                <input id="clave" type="password" class="form-control" formControlName="clave" autocomplete="new-password"
+                       [class.is-invalid]="formClave.controls.clave.invalid && formClave.controls.clave.touched" />
+                <app-error-campo [control]="formClave.controls.clave" [mensajes]="{ required: 'La nueva contraseña es obligatoria' }" />
+                <app-checklist-clave [valor]="formClave.controls.clave.value" />
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="confirmarClave" class="form-label">Confirmar nueva contraseña</label>
+                <input id="confirmarClave" type="password" class="form-control" formControlName="confirmarClave" autocomplete="new-password"
+                       [class.is-invalid]="formClave.controls.confirmarClave.touched && (formClave.controls.confirmarClave.invalid || formClave.hasError('noCoinciden'))" />
+                <app-error-campo [control]="formClave.controls.confirmarClave" [mensajes]="{ required: 'Debes confirmar la contraseña' }" />
+                @if (formClave.hasError('noCoinciden') && formClave.controls.confirmarClave.touched && formClave.controls.confirmarClave.value) {
+                  <div class="invalid-feedback d-block">Las contraseñas no coinciden</div>
+                }
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-outline-primary">Actualizar contraseña</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+}
