@@ -1,0 +1,56 @@
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <h1 class="h3 fw-bold mb-4"><i class="bi bi-plus-circle me-2"></i>Publicar un nuevo tema</h1>
+
+    <div class="card tarjeta">
+      <div class="card-body p-4">
+        <form [formGroup]="form" (ngSubmit)="publicar()" novalidate>
+          <div class="mb-3">
+            <label for="categoriaId" class="form-label">Categoría</label>
+            <select id="categoriaId" class="form-select" formControlName="categoriaId"
+                    [class.is-invalid]="form.controls.categoriaId.invalid && form.controls.categoriaId.touched">
+              <option [ngValue]="0" disabled>Selecciona una categoría...</option>
+              @for (cat of categorias(); track cat.id) {
+                <option [ngValue]="cat.id">{{ cat.nombre }}</option>
+              }
+            </select>
+            <app-error-campo [control]="form.controls.categoriaId" [mensajes]="{ min: 'Debes elegir una categoría' }" />
+          </div>
+
+          <div class="mb-3">
+            <label for="titulo" class="form-label">
+              Título <span class="text-muted small">({{ form.controls.titulo.value.length }}/100)</span>
+            </label>
+            <input id="titulo" type="text" class="form-control" formControlName="titulo"
+                   placeholder="Escribe un título claro y breve"
+                   [class.is-invalid]="form.controls.titulo.invalid && form.controls.titulo.touched" />
+            <app-error-campo [control]="form.controls.titulo" [mensajes]="{
+              required: 'El título es obligatorio',
+              minlength: 'Debe tener al menos 5 caracteres',
+              maxlength: 'No puede superar los 100 caracteres'
+            }" />
+          </div>
+
+          <div class="mb-3">
+            <label for="contenido" class="form-label">
+              Contenido <span class="text-muted small">({{ form.controls.contenido.value.length }}/1000)</span>
+            </label>
+            <textarea id="contenido" rows="6" class="form-control" formControlName="contenido"
+                      placeholder="Cuéntanos de qué quieres conversar..."
+                      [class.is-invalid]="form.controls.contenido.invalid && form.controls.contenido.touched"></textarea>
+            <app-error-campo [control]="form.controls.contenido" [mensajes]="{
+              required: 'El contenido es obligatorio',
+              minlength: 'Debe tener al menos 10 caracteres',
+              maxlength: 'No puede superar los 1000 caracteres'
+            }" />
+          </div>
+
+          <div class="d-flex gap-2 justify-content-end">
+            <a routerLink="/inicio" class="btn btn-outline-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Publicar tema</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

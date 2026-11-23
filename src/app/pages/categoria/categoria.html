@@ -1,0 +1,52 @@
+@if (categoria(); as cat) {
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a routerLink="/inicio">Inicio</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ cat.nombre }}</li>
+    </ol>
+  </nav>
+
+  <div class="card tarjeta mb-4">
+    <div class="card-body d-flex flex-column flex-md-row align-items-md-center gap-3">
+      <span class="icono-categoria" [style.background]="cat.color"><i class="bi" [class]="'bi ' + cat.icono"></i></span>
+      <div class="flex-grow-1">
+        <h1 class="h4 fw-bold mb-1">{{ cat.nombre }}</h1>
+        <p class="text-muted mb-0">{{ cat.descripcion }}</p>
+      </div>
+      <a [routerLink]="['/nuevo-tema']" [queryParams]="{ categoria: cat.id }" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Nuevo tema
+      </a>
+    </div>
+  </div>
+
+  <div class="input-group mb-3">
+    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+    <input type="search" class="form-control" [formControl]="buscador" placeholder="Buscar en {{ cat.nombre }}..." aria-label="Buscar en la categoría" />
+  </div>
+
+  <div class="card tarjeta">
+    <div class="list-group list-group-flush rounded-3">
+      @for (tema of temas(); track tema.id) {
+        <a class="list-group-item lista-tema p-3" [routerLink]="['/tema', tema.id]">
+          <h2 class="h6 fw-bold mb-1">{{ tema.titulo }}</h2>
+          <p class="small text-muted mb-2 texto-cortado">{{ tema.contenido }}</p>
+          <div class="small text-muted d-flex flex-wrap gap-3">
+            <span><i class="bi bi-person me-1"></i>{{ nombreAutor(tema.autorId) }}</span>
+            <span><i class="bi bi-clock me-1"></i>{{ tema.fecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+            <span><i class="bi bi-chat-dots me-1"></i>{{ cantidadComentarios(tema.id) }} comentarios</span>
+          </div>
+        </a>
+      } @empty {
+        <div class="list-group-item text-center text-muted py-5">
+          <i class="bi bi-chat-square-text fs-2 d-block mb-2"></i>
+          Todavía no hay temas aquí. ¡Sé el primero en publicar!
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="text-center py-5">
+    <h1 class="h4">La categoría no existe</h1>
+    <a routerLink="/inicio" class="btn btn-primary mt-3">Volver al inicio</a>
+  </div>
+}

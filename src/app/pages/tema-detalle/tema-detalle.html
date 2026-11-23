@@ -1,0 +1,123 @@
+@if (tema(); as tema) {
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a routerLink="/inicio">Inicio</a></li>
+      @if (categoria(); as cat) {
+        <li class="breadcrumb-item"><a [routerLink]="['/categoria', cat.id]">{{ cat.nombre }}</a></li>
+      }
+      <li class="breadcrumb-item active" aria-current="page">Tema</li>
+    </ol>
+  </nav>
+
+  <!-- Tema -->
+  <article class="card tarjeta mb-4">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap mb-3">
+        <h1 class="h4 fw-bold mb-0">{{ tema.titulo }}</h1>
+        @if (categoria(); as cat) {
+          <span class="badge text-bg-primary">{{ cat.nombre }}</span>
+        }
+      </div>
+
+      @if (autor(tema.autorId); as a) {
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="avatar" [style.background]="colorAvatar(a.id)">{{ iniciales(a.nombre) }}</span>
+          <div class="lh-sm">
+            <div class="fw-semibold">{{ a.nombre }} <span class="badge" [class]="'badge ' + claseRol(a.rol)">{{ a.rol }}</span></div>
+            <div class="small text-muted">{{ tema.fecha | date: 'dd/MM/yyyy HH:mm' }}</div>
+          </div>
+        </div>
+      } @else {
+        <p class="small text-muted">Usuario eliminado · {{ tema.fecha | date: 'dd/MM/yyyy HH:mm' }}</p>
+      }
+
+      @if (tema.baneado) {
+        <div class="contenido-baneado p-3">
+          <i class="bi bi-shield-exclamation me-1"></i>
+          <strong>Este tema fue retirado por la moderación.</strong>
+          <div class="small mt-1">Motivo: {{ tema.motivoBan }}</div>
+        </div>
+      } @else {
+        <p class="mb-0" style="white-space: pre-line">{{ tema.contenido }}</p>
+      }
+
+      @if (puedeBorrar(tema.autorId)) {
+        <div class="mt-3">
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="borrarTema()">
+            <i class="bi bi-trash me-1"></i>Eliminar tema
+          </button>
+        </div>
+      }
+    </div>
+  </article>
+
+  <!-- Comentarios -->
+  <h2 class="h5 fw-bold mb-3"><i class="bi bi-chat-dots me-2"></i>Comentarios ({{ comentarios().length }})</h2>
+
+  <div class="d-flex flex-column gap-3 mb-4">
+    @for (comentario of comentarios(); track comentario.id) {
+      <div class="card tarjeta">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start gap-2">
+            @if (autor(comentario.autorId); as a) {
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="avatar" [style.background]="colorAvatar(a.id)">{{ iniciales(a.nombre) }}</span>
+                <div class="lh-sm">
+                  <div class="fw-semibold">{{ a.nombre }} <span class="badge" [class]="'badge ' + claseRol(a.rol)">{{ a.rol }}</span></div>
+                  <div class="small text-muted">{{ comentario.fecha | date: 'dd/MM/yyyy HH:mm' }}</div>
+                </div>
+              </div>
+            } @else {
+              <div class="small text-muted mb-2">Usuario eliminado · {{ comentario.fecha | date: 'dd/MM/yyyy HH:mm' }}</div>
+            }
+
+            @if (puedeBorrar(comentario.autorId)) {
+              <button type="button" class="btn btn-outline-danger btn-sm" aria-label="Eliminar comentario"
+                      (click)="borrarComentario(comentario.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+            }
+          </div>
+
+          @if (comentario.baneado) {
+            <div class="contenido-baneado p-2 small">
+              <i class="bi bi-shield-exclamation me-1"></i>Comentario retirado por la moderación. Motivo: {{ comentario.motivoBan }}
+            </div>
+          } @else {
+            <p class="mb-0" style="white-space: pre-line">{{ comentario.contenido }}</p>
+          }
+        </div>
+      </div>
+    } @empty {
+      <div class="text-center text-muted py-4">Aún no hay comentarios. ¡Escribe el primero!</div>
+    }
+  </div>
+
+  <!-- Formulario para comentar -->
+  @if (!tema.baneado) {
+    <div class="card tarjeta">
+      <div class="card-body">
+        <h3 class="h6 fw-bold">Escribe un comentario</h3>
+        <form [formGroup]="formComentario" (ngSubmit)="comentar()" novalidate>
+          <textarea rows="3" class="form-control mb-1" formControlName="contenido" placeholder="¿Qué opinas?"
+                    aria-label="Comentario"
+                    [class.is-invalid]="formComentario.controls.contenido.invalid && formComentario.controls.contenido.touched"></textarea>
+          <div class="d-flex justify-content-between small text-muted">
+            <app-error-campo [control]="formComentario.controls.contenido" [mensajes]="{
+              required: 'El comentario no puede estar vacío',
+              minlength: 'Debe tener al menos 3 caracteres',
+              maxlength: 'No puede superar los 500 caracteres'
+            }" />
+            <span class="ms-auto">{{ formComentario.controls.contenido.value.length }}/500</span>
+          </div>
+          <button type="submit" class="btn btn-primary mt-2">Publicar comentario</button>
+        </form>
+      </div>
+    </div>
+  }
+} @else {
+  <div class="text-center py-5">
+    <h1 class="h4">El tema no existe o fue eliminado</h1>
+    <a routerLink="/inicio" class="btn btn-primary mt-3">Volver al inicio</a>
+  </div>
+}
